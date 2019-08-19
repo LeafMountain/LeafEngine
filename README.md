@@ -1,4 +1,4 @@
-# Leaf Engine
+# Tree Engine
 A engine made in combination with a course at FutureGames.
 
 The cource is intended to teach concepts in math and 3D shaders.
