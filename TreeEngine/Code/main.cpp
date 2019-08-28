@@ -1,158 +1,163 @@
 #include <iostream>
-#define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <gl/GL.h>
-#include <fstream>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-using namespace std;
-
-const char* VERTEX_SRC = R"(
-#version 330 core
-in vec2 a_Position;
-in vec3 a_Color;
-
-out vec3 f_Color;
-
-void main()
-{
-	gl_Position = vec4(a_Position, 0.0, 1.0);
-	f_Color = a_Color;
-}
-)";
-
-const char* FRAGMENT_SRC = R"(
-#version 330 core
-in vec3 f_Color;
-out vec4 o_Color;
-
-void main()
-{
-	o_Color = vec4(f_Color, 1.0);
-}
-)";
+#include "Material.h"
+#include "Mesh.h"
+#include "Transform.h"
+#include "Texture.h"
+#include "Camera.h"
 
 bool shouldQuit = false;
+bool KeyState[GLFW_KEY_LAST] = { false };
 
-void OnKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods)
+bool IsKeyPressed(int Key)
 {
-	if (action == GLFW_PRESS)
-	{
-		printf("OnKeyEvent( %d )\n", key);
-	}
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-	{
-		printf("Close\n");
-		shouldQuit = true;
-	}
+	return KeyState[Key];
 }
 
-//int LoadShader(char* filename, GLchar** shaderSource, unsigned long* length)
-//{
-//	ifstream file;
-//	file.open(filename, ios::in);
-//	if (!file) return -1;
-//
-//	length = file
-//
-//	*shaderSource = (GLubyte*) new char[length + 1];
-//}
+void OnKeyEvent(GLFWwindow* Window, int Key, int Scancode, int Action, int Mods)
+{
+	if (Action == GLFW_REPEAT)
+		return;
+
+	KeyState[Key] = (Action == GLFW_PRESS);
+
+	if (Action == GLFW_PRESS)
+	{
+		printf("OnKeyEvent( %d )\n", Key);
+
+		if (Key == GLFW_KEY_ESCAPE)
+		{
+			printf("Close\n");
+			shouldQuit = true;
+		}
+	}
+}
 
 int main()
 {
 	// Create a window and context
 	glfwInit();
 
-	GLFWwindow* window;
-	window = glfwCreateWindow(800, 600, "This is OpenGL", nullptr, nullptr);
+	GLFWwindow* Window;
+	Window = glfwCreateWindow(800, 800, "This is OpenGL", nullptr, nullptr);
 
-	glfwSetKeyCallback(window, OnKeyEvent);
-	glfwMakeContextCurrent(window);
+	glfwSetKeyCallback(Window, OnKeyEvent);
+	glfwMakeContextCurrent(Window);
 
 	// Import OpenGL extensions, through the extensions wrangler
 	glewInit();
 
-	// Vertex POSITIONS //
-	// Create a VBO (Vertex Buffer Object), to contain our triangles
-	GLuint positionBuffer = 0;
-	glCreateBuffers(1, &positionBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
-	// Fill the VBO with data
-	float verts[] =
+// VERTEX STUFF //
+	// TRIANGLE
+	float TriData[]
 	{
-		-0.5, -0.5f,
-		0.5f, -0.5,
-		0.f, 0.5f
+		-0.5f, -0.5f,0.f,	0.f, 0.f,
+		0.5f, -0.5f, 0.f,	1.f, 0.f,
+		0.f, 0.5f, 0.f,		0.5f, 1.f
 	};
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
 
-	// Enable and bind our VBO to an attribute
-	// Tell Opengl that our VBO contains floats and that vertices are grouped two floats at a time
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
-
-	/* COLOR */
-	GLuint colorBuffer = 0;
-	glCreateBuffers(1, &colorBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-
-	// Fill the VBO with data
-	float colors[] =
-	{
-		1.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 1.0f
-	};
-	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
-		
-	printf("Hey good looking !\n");
-
-	glClearColor(0.f, 0.6f, 0.5f, 1.f);
-
-	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-	glShaderSource(vertexShader, 1, &VERTEX_SRC, nullptr);
-	glShaderSource(fragmentShader, 1, &FRAGMENT_SRC, nullptr);
-	glCompileShader(vertexShader);
-	glCompileShader(fragmentShader);
+	Mesh TriangleMesh;
+	TriangleMesh.LoadVerts(TriData, sizeof(TriData));
 	
-	// Make and link shader program
-	GLuint shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-	glUseProgram(shaderProgram);
-
-	// Show to log of the shader program
-	char infoLogBuffer[1024];
-	glGetProgramInfoLog(shaderProgram, 1024, nullptr, infoLogBuffer);
-	printf("SHADER RESULT: \n%s\n", infoLogBuffer);
-
-	// Set the trianglecolor in the shader
-	//GLuint triangleColor = glGetUniformLocation(shaderProgram, "u_TriangleColor");
-
-	while (!glfwWindowShouldClose(window) && !shouldQuit)
+	// QUAD
+	float QuadData[]
 	{
-		//double mouseX = 0;
-		//double mouseY = 0;
-		//glfwGetCursorPos(window, &mouseX, &mouseY);
-		//verts[4] = mouseX;
-		//verts[5] = mouseY;
-		//
-		//float sinTime = sin(glfwGetTime()) * 0.5f + 0.5f;
-		//glUniform4f(triangleColor, ((float)mouseY / 600 * - 1) + 600, (float)mouseY / 600, (float)mouseX / 800, 1.0f);
+		-0.5f, -0.5f, 0.f,	0.f, 0.f,
+		0.5f, -0.5f, 0.f,	1.f, 0.f,
+		0.5f, 0.5f, 0.f,	1.f, 1.f,
+		-0.5f, 0.5f, 0.f,	0.f, 1.f
+	};
 
-		// Clear screen
-		glClear(GL_COLOR_BUFFER_BIT);
+	Mesh QuadMesh;
+	QuadMesh.LoadVerts(QuadData, sizeof(QuadData));
 
-		// Draw triangle
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
 
-		// Swap back-buffer to the front and poll and handle window events
-		glfwSwapBuffers(window);
+// UNIFORMS
+
+	Material DefaultMaterial;
+	DefaultMaterial.LoadFile("Res/Shaders/default.vert", "Res/Shaders/default.frag");
+	DefaultMaterial.Use();
+
+	Texture MyTexture;
+	MyTexture.LoadFile("Res/Image.jpg");
+	MyTexture.Bind();
+
+	// Transforms
+	Transform Transforms[4];
+	Transforms[0].Position = glm::vec3(0.f);
+	Transforms[1].Position = glm::vec3(1.5f, 0.f, 0.f);
+	Transforms[2].Position = glm::vec3(3.f, 0.f, 0.f);
+	Transforms[3].Position = glm::vec3(-3.f, 0.f, 0.f);
+
+
+	// Camera
+	Camera Cam;
+	Cam.Position = glm::vec3(0.f, 0.f, 5.f);
+
+	float Ratio = 1024.f / 600.f;
+	glm::mat4 Projection;
+	Projection = glm::perspective(glm::radians(60.f), Ratio, 0.2f, 100.f);
+	DefaultMaterial.Set("u_Projection", Projection);
+
+	glEnable(GL_DEPTH_TEST);
+
+	glClearColor(0.1f, 0.1f, 0.1f, 1.f);
+
+	float LastFrameTime = 0.f;
+
+	glfwGetCursorPos(Window, 0, 0);
+	glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	while (!glfwWindowShouldClose(Window) && !shouldQuit)
+	{
+		float DeltaTime = LastFrameTime - glfwGetTime();
+		LastFrameTime = glfwGetTime();
+
+
+		glm::vec3 Velocity = glm::vec3(0.f);
+		Velocity -= Cam.Direction;
+
+		//Velocity.z += IsKeyPressed(GLFW_KEY_W) ? 1 : 0;
+		//Velocity.z += IsKeyPressed(GLFW_KEY_S) ? -1 : 0;
+		//Velocity.x += IsKeyPressed(GLFW_KEY_A) ? 1 : 0;
+		//Velocity.x += IsKeyPressed(GLFW_KEY_D) ? -1 : 0;
+
+
+		
+		float Speed = 1;
+		Velocity *= DeltaTime * Speed;
+
+		Cam.Position += Velocity;
+
+		double MouseX = 0;
+		double MouseY = 0;
+		glfwGetCursorPos(Window, &MouseX, &MouseY);
+
+		glm::vec3 CameraDirection = Cam.Direction;
+		CameraDirection = glm::vec3(cos(CameraDirection.x * MouseX) - sin(CameraDirection.z * MouseX), 0, 0) * DeltaTime;
+		CameraDirection = glm::normalize(CameraDirection);
+		Cam.Direction = CameraDirection;
+
+		// Reset mouse
+		glfwSetCursorPos(Window, 0, 0);
+
+		DefaultMaterial.Set("u_View", Cam.GetViewMatrix());
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+		QuadMesh.Bind();
+
+		for (int i = 0; i < 3; ++i)
+		{
+			DefaultMaterial.Set("u_World", Transforms[i].GetMatrix());
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		}
+
+		glfwSwapBuffers(Window);
 		glfwPollEvents();
 	}
 

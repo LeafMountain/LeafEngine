@@ -92,7 +92,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>Libs</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;glew32s.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -124,7 +124,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Code\Camera.cpp" />
     <ClCompile Include="Code\main.cpp" />
+    <ClCompile Include="Code\Material.cpp" />
+    <ClCompile Include="Code\Mesh.cpp" />
+    <ClCompile Include="Code\Texture.cpp" />
+    <ClCompile Include="Code\Transform.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Code\Camera.h" />
+    <ClInclude Include="Code\Material.h" />
+    <ClInclude Include="Code\Mesh.h" />
+    <ClInclude Include="Code\Texture.h" />
+    <ClInclude Include="Code\Transform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

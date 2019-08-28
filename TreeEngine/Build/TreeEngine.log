@@ -1,4 +1,4 @@
 ﻿  main.cpp
-C:\Users\alexander.lovberg\Projects\Personal\TreeEngine\TreeEngine\Code\main.cpp(2,1): warning C4005:  'GLEW_STATIC': macro redefinition
-C:\Users\alexander.lovberg\Projects\Personal\TreeEngine\TreeEngine\Code\main.cpp(2,1): warning C4005: C:\Users\alexander.lovberg\Projects\Personal\TreeEngine\TreeEngine\Code\main.cpp: note: see previous definition of 'GLEW_STATIC'
+C:\Users\alexander.lovberg\Projects\Personal\TreeEngine\TreeEngine\Code\main.cpp(118,19): warning C4244:  'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\alexander.lovberg\Projects\Personal\TreeEngine\TreeEngine\Code\main.cpp(119,30): warning C4244:  '=': conversion from 'double' to 'float', possible loss of data
   TreeEngine.vcxproj -> C:\Users\alexander.lovberg\Projects\Personal\TreeEngine\TreeEngine\Binary\TreeEngine.exe
