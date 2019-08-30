@@ -14,6 +14,41 @@
 bool shouldQuit = false;
 bool KeyState[GLFW_KEY_LAST] = { false };
 
+bool LeftMousePressed = false;
+
+const float CubeVertexData[] =
+{
+	// Front face
+	-1.f, -1.f, 1.f,	0.f, 0.f, 1.f,	0.f, 0.f,
+	1.f, -1.f, 1.f,		0.f, 0.f, 1.f,	1.f, 0.f,
+	1.f, 1.f, 1.f,		0.f, 0.f, 1.f,	1.f, 1.f,
+	-1.f, 1.f, 1.f,		0.f, 0.f, 1.f,	0.f, 1.f,
+
+	// Back face
+	-1.f, -1.f, -1.f,	0.f, 0.f, -1.f,	0.f, 0.f,
+	1.f, -1.f, -1.f,	0.f, 0.f, -1.f,	1.f, 0.f,
+	1.f, 1.f, -1.f,		0.f, 0.f, -1.f,	1.f, 1.f,
+	-1.f, 1.f, -1.f,	0.f, 0.f, -1.f,	0.f, 1.f,
+
+	// Right face
+	-1.f, -1.f, -1.f,	0.f, 0.f, -1.f,	0.f, 0.f,
+	1.f, -1.f, -1.f,	0.f, 0.f, -1.f,	1.f, 0.f,
+	1.f, 1.f, -1.f,		0.f, 0.f, -1.f,	1.f, 1.f,
+	-1.f, 1.f, -1.f,	0.f, 0.f, -1.f,	0.f, 1.f,
+};
+
+const unsigned int CubeIndexData[] =
+{
+	// Front face
+	0, 1, 2,	0, 2, 3,
+
+	// Back face
+	4, 5, 6,	4, 6, 7,
+
+	// Top face
+	7, 4, 3,	7, 3, 6
+};
+
 bool IsKeyPressed(int Key)
 {
 	return KeyState[Key];
@@ -38,6 +73,15 @@ void OnKeyEvent(GLFWwindow* Window, int Key, int Scancode, int Action, int Mods)
 	}
 }
 
+void OnMouseButton(GLFWwindow* Window, int Button, int Action, int Mods)
+{
+	if (Button == GLFW_MOUSE_BUTTON_RIGHT)
+	{
+		LeftMousePressed = Action == GLFW_PRESS;
+		glfwSetInputMode(Window, GLFW_CURSOR, LeftMousePressed ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+	}
+}
+
 int main()
 {
 	// Create a window and context
@@ -56,25 +100,31 @@ int main()
 	// TRIANGLE
 	float TriData[]
 	{
-		-0.5f, -0.5f,0.f,	0.f, 0.f,
-		0.5f, -0.5f, 0.f,	1.f, 0.f,
-		0.f, 0.5f, 0.f,		0.5f, 1.f
+		-0.5f, -0.5f,0.f,	0.f, 0.f, 1.f,	0.f, 0.f,
+		0.5f, -0.5f, 0.f,	0.f, 0.f, 1.f,	1.f, 0.f,
+		0.f, 0.5f, 0.f,		0.f, 0.f, 1.f,	0.5f, 1.f
 	};
 
 	Mesh TriangleMesh;
-	TriangleMesh.LoadVerts(TriData, sizeof(TriData));
+	TriangleMesh.LoadVerts(TriData, sizeof(TriData), nullptr, 0);
 	
 	// QUAD
 	float QuadData[]
 	{
-		-0.5f, -0.5f, 0.f,	0.f, 0.f,
-		0.5f, -0.5f, 0.f,	1.f, 0.f,
-		0.5f, 0.5f, 0.f,	1.f, 1.f,
-		-0.5f, 0.5f, 0.f,	0.f, 1.f
+		-0.5f, -0.5f, 0.f,	0.f, 0.f, 1.f,	0.f, 0.f,
+		0.5f, -0.5f, 0.f,	0.f, 0.f, 1.f,	1.f, 0.f,
+		-0.5f, 0.5f, 0.f,	0.f, 0.f, 1.f,	0.f, 1.f,
+		0.5f, 0.5f, 0.f,	0.f, 0.f, 1.f,	1.f, 1.f,
 	};
 
 	Mesh QuadMesh;
-	QuadMesh.LoadVerts(QuadData, sizeof(QuadData));
+	QuadMesh.LoadVerts(QuadData, sizeof(QuadData), nullptr, 0);
+
+	Mesh CubeMesh;
+	CubeMesh.LoadVerts(CubeVertexData, sizeof(CubeVertexData), CubeIndexData, sizeof(CubeIndexData));
+
+	Mesh DeerMesh;
+	DeerMesh.LoadFile("Res/deer.obj");
 
 
 // UNIFORMS
@@ -90,10 +140,11 @@ int main()
 	// Transforms
 	Transform Transforms[4];
 	Transforms[0].Position = glm::vec3(0.f);
-	Transforms[1].Position = glm::vec3(1.5f, 0.f, 0.f);
-	Transforms[2].Position = glm::vec3(3.f, 0.f, 0.f);
-	Transforms[3].Position = glm::vec3(-3.f, 0.f, 0.f);
+	Transforms[1].Position = glm::vec3(2.f, 0.f, -1.f);
+	Transforms[2].Position = glm::vec3(4.f, 0.f, -2.f);
+	Transforms[2].Scale = glm::vec3(1.f) * 0.1f;
 
+	DefaultMaterial.Set("u_LightDirection", glm::vec3(0.f, -1.f, 0.f));
 
 	// Camera
 	Camera Cam;
@@ -110,53 +161,77 @@ int main()
 
 	float LastFrameTime = 0.f;
 
-	glfwGetCursorPos(Window, 0, 0);
-	glfwSetInputMode(Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPos(Window, 0, 0);
+	glfwSetMouseButtonCallback(Window, OnMouseButton);
 
 	while (!glfwWindowShouldClose(Window) && !shouldQuit)
 	{
-		float DeltaTime = LastFrameTime - glfwGetTime();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		float DeltaTime = glfwGetTime() - LastFrameTime;
 		LastFrameTime = glfwGetTime();
-
-
-		glm::vec3 Velocity = glm::vec3(0.f);
-		Velocity -= Cam.Direction;
-
-		//Velocity.z += IsKeyPressed(GLFW_KEY_W) ? 1 : 0;
-		//Velocity.z += IsKeyPressed(GLFW_KEY_S) ? -1 : 0;
-		//Velocity.x += IsKeyPressed(GLFW_KEY_A) ? 1 : 0;
-		//Velocity.x += IsKeyPressed(GLFW_KEY_D) ? -1 : 0;
-
-
-		
-		float Speed = 1;
-		Velocity *= DeltaTime * Speed;
-
-		Cam.Position += Velocity;
 
 		double MouseX = 0;
 		double MouseY = 0;
 		glfwGetCursorPos(Window, &MouseX, &MouseY);
 
-		glm::vec3 CameraDirection = Cam.Direction;
-		CameraDirection = glm::vec3(cos(CameraDirection.x * MouseX) - sin(CameraDirection.z * MouseX), 0, 0) * DeltaTime;
-		CameraDirection = glm::normalize(CameraDirection);
-		Cam.Direction = CameraDirection;
-
-		// Reset mouse
-		glfwSetCursorPos(Window, 0, 0);
-
-		DefaultMaterial.Set("u_View", Cam.GetViewMatrix());
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-		QuadMesh.Bind();
-
-		for (int i = 0; i < 3; ++i)
+		if (LeftMousePressed == true)
 		{
-			DefaultMaterial.Set("u_World", Transforms[i].GetMatrix());
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+			glm::vec3 Velocity = glm::vec3(0.f);
+
+			Velocity += IsKeyPressed(GLFW_KEY_W) ? Cam.GetForwardVector() : glm::vec3(0.f);
+			Velocity += IsKeyPressed(GLFW_KEY_S) ? -Cam.GetForwardVector() : glm::vec3(0.f);
+			Velocity += IsKeyPressed(GLFW_KEY_A) ? -Cam.GetRightVector() : glm::vec3(0.f);
+			Velocity += IsKeyPressed(GLFW_KEY_D) ? Cam.GetRightVector() : glm::vec3(0.f);
+		
+			if (IsKeyPressed(GLFW_KEY_SPACE)) Velocity += glm::vec3(0.f, 1.f, 0.f);
+			if (IsKeyPressed(GLFW_KEY_C)) Velocity -= glm::vec3(0.f, 1.f, 0.f);
+
+			float Speed = 5;
+			Velocity *= DeltaTime * Speed;
+
+			Cam.Position += Velocity;
+
+			float MouseSensitivity = 2.f;
+			Cam.AddYaw(-MouseX * DeltaTime * MouseSensitivity);
+			Cam.AddPitch(-MouseY * DeltaTime * MouseSensitivity);
+
+			// Reset mouse
+			glfwSetCursorPos(Window, 0, 0);
 		}
 
+		// Set view
+		DefaultMaterial.Set("u_View", Cam.GetViewMatrix());
+
+		// Rotate cube
+		glm::quat DeltaRotation = glm::angleAxis(glm::radians(90.f) * DeltaTime, glm::normalize(glm::vec3(1.f, 1.f, 0.f)));
+
+		for (int i = 0; i < 3; i++)
+		{
+			Transforms[i].Rotation *= DeltaRotation;
+		}
+		
+		// Draw cube
+		//CubeMesh.Bind();
+		//DefaultMaterial.Set("u_World", Transforms[0].GetMatrix());
+		//glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
+
+		// Draw quad
+		QuadMesh.Bind();
+		DefaultMaterial.Set("u_World", Transforms[1].GetMatrix());
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+		// Draw triangle
+		//TriangleMesh.Bind();
+		//DefaultMaterial.Set("u_World", Transforms[2].GetMatrix());
+		//glDrawArrays(GL_TRIANGLE_STRIP, 0, 3);
+
+		DeerMesh.Bind();
+		DefaultMaterial.Set("u_World", Transforms[2].GetMatrix());
+		glDrawArrays(GL_TRIANGLES, 0, DeerMesh.Triangles);
+
+
+		// Swap buffers
 		glfwSwapBuffers(Window);
 		glfwPollEvents();
 	}

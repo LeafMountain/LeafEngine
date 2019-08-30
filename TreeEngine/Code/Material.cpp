@@ -70,3 +70,9 @@ void Material::Set(const char* name, const glm::mat4& value)
 	GLuint Location = glGetUniformLocation(ProgramHandle, name);
 	glUniformMatrix4fv(Location, 1, false, glm::value_ptr(value));
 }
+
+void Material::Set(const char* name, const glm::vec3& value)
+{
+	GLuint Location = glGetUniformLocation(ProgramHandle, name);
+	glUniform3fv(Location, 1, glm::value_ptr(value));
+}

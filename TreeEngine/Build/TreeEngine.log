@@ -1,4 +1,2 @@
-﻿  main.cpp
-C:\Users\alexander.lovberg\Projects\Personal\TreeEngine\TreeEngine\Code\main.cpp(118,19): warning C4244:  'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\alexander.lovberg\Projects\Personal\TreeEngine\TreeEngine\Code\main.cpp(119,30): warning C4244:  '=': conversion from 'double' to 'float', possible loss of data
+﻿  Mesh.cpp
   TreeEngine.vcxproj -> C:\Users\alexander.lovberg\Projects\Personal\TreeEngine\TreeEngine\Binary\TreeEngine.exe

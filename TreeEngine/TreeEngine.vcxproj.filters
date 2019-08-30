@@ -14,5 +14,6 @@
     <ClInclude Include="Code\Transform.h" />
     <ClInclude Include="Code\Texture.h" />
     <ClInclude Include="Code\Camera.h" />
+    <ClInclude Include="Code\IInputModule.h" />
   </ItemGroup>
 </Project>
