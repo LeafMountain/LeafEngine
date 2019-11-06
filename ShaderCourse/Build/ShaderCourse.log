@@ -1,0 +1,8 @@
+﻿  main.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': macro redefinition
+C:\Users\alexander.lovberg\Desktop\19-09-18\ShaderCourse\ShaderCourse\Include\GLFW\glfw3.h(104): message : see previous definition of 'APIENTRY'
+C:\Users\alexander.lovberg\Desktop\19-09-18\ShaderCourse\ShaderCourse\Code\main.cpp(189,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\alexander.lovberg\Desktop\19-09-18\ShaderCourse\ShaderCourse\Code\main.cpp(456,21): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\alexander.lovberg\Desktop\19-09-18\ShaderCourse\ShaderCourse\Code\main.cpp(467,34): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\alexander.lovberg\Desktop\19-09-18\ShaderCourse\ShaderCourse\Code\main.cpp(468,36): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+  ShaderCourse.vcxproj -> C:\Users\alexander.lovberg\Desktop\19-09-18\ShaderCourse\ShaderCourse\Binary\CoolProgram.exe
