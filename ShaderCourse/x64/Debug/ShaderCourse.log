@@ -1,0 +1,21 @@
+﻿  Camera.cpp
+  CubeMap.cpp
+C:\Users\Lovberg\OneDrive - Change Maker Education\Documents\TreeEngine\ShaderCourse\Code\Camera.h(2,10): fatal error C1083: Cannot open include file: 'glm/glm.hpp': No such file or directory
+  FrameBuffer.cpp
+C:\Users\Lovberg\OneDrive - Change Maker Education\Documents\TreeEngine\ShaderCourse\Code\CubeMap.h(2,10): fatal error C1083: Cannot open include file: 'GL/glew.h': No such file or directory
+  main.cpp
+C:\Users\Lovberg\OneDrive - Change Maker Education\Documents\TreeEngine\ShaderCourse\Code\FrameBuffer.h(2,10): fatal error C1083: Cannot open include file: 'GL/glew.h': No such file or directory
+  Material.cpp
+C:\Users\Lovberg\OneDrive - Change Maker Education\Documents\TreeEngine\ShaderCourse\Code\main.cpp(2,10): fatal error C1083: Cannot open include file: 'GL/glew.h': No such file or directory
+  Mesh.cpp
+C:\Users\Lovberg\OneDrive - Change Maker Education\Documents\TreeEngine\ShaderCourse\Code\Material.h(2,10): fatal error C1083: Cannot open include file: 'GL/glew.h': No such file or directory
+  PointLight.cpp
+C:\Users\Lovberg\OneDrive - Change Maker Education\Documents\TreeEngine\ShaderCourse\Code\Mesh.h(2,10): fatal error C1083: Cannot open include file: 'glm/glm.hpp': No such file or directory
+  SpotLight.cpp
+C:\Users\Lovberg\OneDrive - Change Maker Education\Documents\TreeEngine\ShaderCourse\Code\PointLight.h(2,10): fatal error C1083: Cannot open include file: 'glm/glm.hpp': No such file or directory
+  Texture.cpp
+C:\Users\Lovberg\OneDrive - Change Maker Education\Documents\TreeEngine\ShaderCourse\Code\SpotLight.h(2,10): fatal error C1083: Cannot open include file: 'glm/glm.hpp': No such file or directory
+  Transform.cpp
+C:\Users\Lovberg\OneDrive - Change Maker Education\Documents\TreeEngine\ShaderCourse\Code\Texture.h(2,10): fatal error C1083: Cannot open include file: 'GL/glew.h': No such file or directory
+  Generating Code...
+C:\Users\Lovberg\OneDrive - Change Maker Education\Documents\TreeEngine\ShaderCourse\Code\Transform.h(2,10): fatal error C1083: Cannot open include file: 'glm/glm.hpp': No such file or directory

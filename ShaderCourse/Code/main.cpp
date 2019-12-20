@@ -29,6 +29,7 @@ Mesh TriangleMesh;
 Mesh QuadMesh;
 Mesh CubeMesh;
 Material DefaultMaterial;
+Material CustomMaterial;
 Material SkyboxMaterial;
 Material LightSourceMaterial;
 Texture CherylTexture;
@@ -157,6 +158,15 @@ void RenderCube(const Transform& Transform)
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }
 
+void RenderCustom(const Transform& Transform)
+{
+	QuadMesh.Bind();
+	CustomMaterial.Set("u_World", Transform.GetMatrix());
+	//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+}
+
 void RenderSkybox()
 {
 	SkyboxTexture.Bind();
@@ -266,6 +276,15 @@ void RenderScene(bool RenderPlayer)
 		MainLight.UploadToMaterial(0, DefaultMaterial);
 	}
 
+
+	// Custom render
+	{
+		Transform CustomTransform;
+		CustomTransform.Position = glm::vec3(20.0f, 5.0f, 0.0f);
+		CustomTransform.Scale = glm::vec3(5.0f, 5.0f, 5.0f);
+		RenderCustom(CustomTransform);
+	}
+
 	{
 		glm::vec3 RotationAxis = glm::vec3(cos(Time * 0.62f), sin(Time * 0.9f) * 2.f, cos(-Time * 0.5f) * 0.5f);
 		RotationAxis = glm::normalize(RotationAxis);
@@ -275,6 +294,7 @@ void RenderScene(bool RenderPlayer)
 		BaseTransform.Rotation = glm::angleAxis(Time, RotationAxis);
 
 		RenderCube(BaseTransform);
+
 
 		static Transform ChildTransform = Transform(glm::vec3(2.5f, 0.f, 0.f), quat_identity, glm::vec3(0.5f));
 		/*
@@ -387,6 +407,9 @@ int main()
 	DefaultMaterial.LoadFiles("Res/Shader/default.vert", "Res/Shader/default.frag"); //insert cheese
 	DefaultMaterial.Set("u_DirLight.ShadowBuffer", 2);
 
+	CustomMaterial.LoadFiles("Res/Shader/custom.vert", "Res/Shader/custom.frag");
+	CustomMaterial.Set("u_DirLight.ShadowBuffer", 2);
+
 	Material PostProcessMaterial;
 	PostProcessMaterial.LoadFiles("Res/Shader/post_process.vert", "Res/Shader/post_process.frag");
 	PostProcessMaterial.Set("u_FrameColor", 0);
@@ -395,7 +418,7 @@ int main()
 	SkyboxMaterial.LoadFiles("Res/Shader/skybox.vert", "Res/Shader/skybox.frag");
 	LightSourceMaterial.LoadFiles("Res/Shader/light_source.vert", "Res/Shader/light_source.frag");
 
-	CherylTexture.LoadFile("Res/brick.jpg");
+	CherylTexture.LoadFile("Res/img_cheryl.jpg");
 	CherylTexture.Bind();
 
 	SkyboxTexture.LoadFiles(SkyboxImages);
@@ -409,16 +432,24 @@ int main()
 	DefaultMaterial.Set("u_DirLight.Direction", LightDirection);
 	DefaultMaterial.Set("u_DirLight.Color", glm::vec3(0.9f, 0.9f, 1.f));
 
+	CustomMaterial.Set("u_DirLight.Direction", LightDirection);
+	CustomMaterial.Set("u_DirLight.Color", glm::vec3(0.9f, 0.9f, 1.f));
+
 	// Point light stuff!
 	MainLight.Position = glm::vec3(0.f, 1.f, 0.f);
 	MainLight.Color =  glm::vec3(1.f, 0.f, 0.f);
 	MainLight.Radius = 20.f;
 	MainLight.UploadToMaterial(0, DefaultMaterial);
 
+	MainLight.UploadToMaterial(0, CustomMaterial);
+
 	SecondLight.Position = glm::vec3(0.f, 1.f, 0.f);
 	SecondLight.Color =  glm::vec3(0.4f, 0.4f, 1.f);
 	SecondLight.Radius = 40.f;
 	SecondLight.UploadToMaterial(1, DefaultMaterial);
+
+	SecondLight.UploadToMaterial(1, CustomMaterial);
+
 
 	FlashLight.Position = glm::vec3(0.f, 2.f, 10.f);
 	FlashLight.Direction = glm::vec3(0.f, 0.f, -1.f);
@@ -427,9 +458,13 @@ int main()
 	FlashLight.Length = 30.f;
 	FlashLight.UploadToMaterial(DefaultMaterial);
 
+	FlashLight.UploadToMaterial(CustomMaterial);
+
 	glm::mat4 Projection;
 	Projection = glm::perspective(glm::radians(60.f), Ratio, 0.2f, 150.f);
 	DefaultMaterial.Set("u_Projection", Projection);
+
+	CustomMaterial.Set("u_Projection", Projection);
 
 	glEnable(GL_DEPTH_TEST);
 	float LastFrameTime = 0.f;
@@ -495,21 +530,21 @@ int main()
 
 
 		playerVelocity.x *= (0.7f);
-		playerVelocity.y *= (0.5f);
+		playerVelocity.y *= (0.7f);
 		playerVelocity.z *= (0.7f);
 
-		if (TheCamera.Position.y > 0.0f)
-		{
-			// Apply gravity
-			playerVelocity.y += -0.05f;
-		}
-		else // The player is grounded
-		{
-			if (IsKeyPressed(GLFW_KEY_SPACE))
-			{
-				playerVelocity.y += 1.5f;
-			}
-		}
+		//if (TheCamera.Position.y > 0.0f)
+		//{
+		//	// Apply gravity
+		//	playerVelocity.y += -0.05f;
+		//}
+		//else // The player is grounded
+		//{
+		//	if (IsKeyPressed(GLFW_KEY_SPACE))
+		//	{
+		//		playerVelocity.y += 1.5f;
+		//	}
+		//}
 
 		TheCamera.Position += playerVelocity;
 
@@ -517,6 +552,10 @@ int main()
 
 		DefaultMaterial.Set("u_View", TheCamera.GetViewMatrix());
 		DefaultMaterial.Set("u_EyePosition", TheCamera.Position);
+
+		CustomMaterial.Set("u_View", TheCamera.GetViewMatrix());
+		CustomMaterial.Set("u_EyePosition", TheCamera.Position);
+		CustomMaterial.Set("u_Time", CurrentTime);
 
 		MainLight.Color = glm::vec3(1.f, 0.3f, 0.3f) * (glm::sin(CurrentTime * 5.f) + 1.f) * 4.f;
 		MainLight.Position = glm::vec3(glm::sin(CurrentTime) * 5.f, 0.2f, glm::cos(CurrentTime) * 2.f);
